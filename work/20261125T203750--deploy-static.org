@@ -156,9 +156,6 @@ ls
 #+RESULTS:
 : bb.edn			clojure-cdmx.zip	README.md		work
 
-
-The upload now parses, but it says the zip is "no such file or folder". Either the =~= was not expanded (the path is quoted or escaped) or the =cp= from Downloads did not land. This read-only block lists both places:
-
 #+name: find-zip
 #+begin_src sh
 ls -l ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io/clojure-cdmx.zip ~/Downloads/clojure-cdmx.zip
@@ -167,6 +164,12 @@ ls -l ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io/clojure-cdmx.zip ~/Do
 #+RESULTS: find-zip
 : -rw-r--r--@ 1 kyle  staff  404706 Nov 25 20:52 /Users/kyle/Downloads/clojure-cdmx.zip
 : -rw-r--r--@ 1 kyle  staff  404706 Nov 25 21:00 /Users/kyle/src/github.com/clojure-cdmx/clojure-cdmx.github.io/clojure-cdmx.zip
+
+Upload
+
+#+begin_src sh
+aa sandbox upload --id=5ED17DA1-8B66-4D4D-9ADC-F154D830B867 -p /Users/kyle/Downloads/clojure-cdmx.zip
+#+end_src
 
 ** Result
 Branch =deploy-site=, on =main=:
