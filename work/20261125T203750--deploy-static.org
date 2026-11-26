@@ -4,12 +4,14 @@
 #+TITLE: Deploy static site
 #+CATEGORY: work
 
-1. Designed a "papel picado" for Clojure, parens, and a "REPL" motif using this prompt:
+1. Designed a "papel picado" for Clojure, parens, and a "REPL" motif using Inkscape.
 
    
 2. Used ChatGPT to create a site, with this file as an upload.
 
-      #+begin_example
+   Prompt:
+   
+   #+begin_example
       I want to create the Clojure Mexico City page. These day-of-the-dead style flags with Clojure themes should be strung at the top, looping down slightly, maybe with a couple of shapes to either side in complementary colors. The contents: "Meetups", taking us to a meetup list. Highlighted on front page:  Next meetup: 1 diciembre, Estación San Miguel, San Miguel Chapultepec. QR code to Luma.
 
       Theme: professional but playful.
