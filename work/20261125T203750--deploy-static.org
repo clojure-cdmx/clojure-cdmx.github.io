@@ -1,0 +1,150 @@
+#+TARGET: clojure_cdmx ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io
+#+TARGET: downloads ~/Downloads
+#+TITLE: deploy-static
+#+CATEGORY: work
+
+
+* Deploy as static site to Github Pages                           :downloads:
+
+** Download script
+
+From gh pages, used this script
+
+#+begin_src js
+  (async () => {
+  if (location.hostname !== "clojure-cdmx.kyle577496.chatgpt.site" ||
+      !document.querySelector("main#contenido")) {
+    throw Error("Open the signed-in Clojure CDMX page first.");
+  }
+
+  const assets = [
+    "site.css", "luma.js", "paper.png", "rosette.svg", "qr-preview.svg",
+    "clojure-mark.png", "clojure-mark.svg", "papel-picado.svg",
+    "papel-picado-small.svg", "headline.woff2", "headline-italic.woff2",
+    "FONT-LICENSE", "qr/LICENSE",
+    ...["index", "QR8bitByte", "QRBitBuffer", "QRErrorCorrectLevel",
+        "QRMaskPattern", "QRMath", "QRMode", "QRPolynomial", "QRRSBlock",
+        "QRUtil"].map(name => `qr/${name}.js`)
+  ];
+  const paths = ["index.html", "meetups/index.html", "meetup-config.js",
+                 ...assets.map(name => `assets/${name}`)];
+
+  async function readFile(path) {
+    const url = "/" + path.replace(/index\.html$/, "");
+    const response = await fetch(url, { credentials: "same-origin" });
+    if (!response.ok) throw Error(`${url} returned HTTP ${response.status}`);
+
+    if (!path.endsWith(".html")) {
+      if (response.headers.get("content-type")?.includes("text/html"))
+        throw Error(`Expected a site asset at ${url}, but received a web page.`);
+      return new Uint8Array(await response.arrayBuffer());
+    }
+
+    const doc = new DOMParser().parseFromString(await response.text(), "text/html");
+    if (!doc.querySelector("main#contenido"))
+      throw Error(`Could not read ${url}. Confirm you're signed in.`);
+    const markup = nodes => Array.from(nodes, node => node.outerHTML).join("\n");
+    const head = doc.head.querySelectorAll(
+      'title, meta[charset], meta[name="viewport"], meta[name="description"], ' +
+      'meta[name="theme-color"], link[href^="/assets/"], script[src="/assets/luma.js"]'
+    );
+    const body = doc.querySelectorAll("a.skip, header.masthead, main#contenido, body > footer");
+    return new TextEncoder().encode(
+      `<!doctype html><html lang="es-MX"><head>${markup(head)}</head>` +
+      `<body>${markup(body)}</body></html>`
+    );
+  }
+
+  function header(size, signature) {
+    const bytes = new Uint8Array(size), view = new DataView(bytes.buffer);
+    view.setUint32(0, signature, true);
+    return {
+      bytes,
+      short: (at, value) => view.setUint16(at, value, true),
+      long: (at, value) => view.setUint32(at, value, true)
+    };
+  }
+
+  const files = [], directory = [];
+  let offset = 0;
+  for (const path of paths) {
+    const data = await readFile(path);
+    const name = new TextEncoder().encode(path);
+    let crc = -1;
+    for (const byte of data) {
+      crc ^= byte;
+      for (let bit = 0; bit < 8; bit++)
+        crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+    }
+    crc = (~crc) >>> 0;
+
+    const local = header(30, 0x04034b50), entry = header(46, 0x02014b50);
+    local.short(4, 20); local.short(12, 33); local.long(14, crc);
+    local.long(18, data.length); local.long(22, data.length);
+    local.short(26, name.length);
+    entry.short(4, 20); entry.short(6, 20); entry.short(14, 33);
+    entry.long(16, crc); entry.long(20, data.length); entry.long(24, data.length);
+    entry.short(28, name.length); entry.long(42, offset);
+    files.push(local.bytes, name, data);
+    directory.push(entry.bytes, name);
+    offset += 30 + name.length + data.length;
+  }
+
+  const end = header(22, 0x06054b50);
+  end.short(8, paths.length); end.short(10, paths.length);
+  end.long(12, directory.reduce((sum, part) => sum + part.length, 0));
+  end.long(16, offset);
+
+  const zip = new Blob([...files, ...directory, end.bytes], {type: "application/zip"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(zip);
+  link.download = "clojure-cdmx.zip";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 60000);
+  return `Download started: clojure-cdmx.zip (${paths.length} files)`;
+})()
+#+end_src
+
+** Downloaded                                                    :downloads:
+
+Resulted in this download.
+
+#+begin_src sh
+ls | grep cdmx
+#+end_src
+
+#+RESULTS:
+: clojure-cdmx
+: clojure-cdmx.zip
+
+#+begin_src sh
+cp clojure-cdmx.zip ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io
+#+end_src
+
+#+RESULTS:
+
+
+* Deploy site                                                  :clojure_cdmx:
+:PROPERTIES:
+:BRANCH:   deploy-site
+:BASE:     main
+:REPO:     ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io
+:ID:       5ED17DA1-8B66-4D4D-9ADC-F154D830B867
+:END:
+
+See [[*Deploy as static site to Github Pages][Deploy as static site to Github Pages]]
+
+#+begin_src sh
+ls
+#+end_src
+
+#+RESULTS:
+: bb.edn			clojure-cdmx.zip	README.md		work
+
+:AGENT:
+- inspect zip file
+- give me steps to deploy
+:END:
+
