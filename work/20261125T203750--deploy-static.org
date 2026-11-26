@@ -143,8 +143,265 @@ ls
 #+RESULTS:
 : bb.edn			clojure-cdmx.zip	README.md		work
 
-:AGENT:
-- inspect zip file
-- give me steps to deploy
-:END:
+
+The upload now parses, but it says the zip is "no such file or folder". Either the =~= was not expanded (the path is quoted or escaped) or the =cp= from Downloads did not land. This read-only block lists both places:
+
+#+name: find-zip
+#+begin_src sh
+ls -l ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io/clojure-cdmx.zip ~/Downloads/clojure-cdmx.zip
+#+end_src
+
+#+RESULTS: find-zip
+: -rw-r--r--@ 1 kyle  staff  404706 Nov 25 20:52 /Users/kyle/Downloads/clojure-cdmx.zip
+: -rw-r--r--@ 1 kyle  staff  404706 Nov 25 21:00 /Users/kyle/src/github.com/clojure-cdmx/clojure-cdmx.github.io/clojure-cdmx.zip
+
+** Result
+Branch =deploy-site=, on =main=:
+- bcb042d Add static site for GitHub Pages
+
+The commit unpacks =clojure-cdmx.zip= at the repo root: =index.html=, =meetups/index.html=, =meetup-config.js=, =assets/= (23 files), plus an empty =.nojekyll=. The zip itself is not committed. Not run: any browser check, because there is no browser here.
+
+For you to decide:
+- Pages are served from the root, and the HTML uses root-absolute =/assets/...= links. That works for the org site =clojure-cdmx.github.io=. It breaks if the site is served under a subpath, such as a project repo.
+- =work/= (the operator's workbook) is already on =main=, so GitHub Pages will publish it. I left it alone.
+
+** Land and open a PR
+
+#+name: land-preview
+#+begin_src sh
+atomforge bundle land 5ED17DA1
+#+end_src
+
+#+RESULTS: land-preview
+#+begin_example
+== deploy-site (new)
+bcb042d Add static site for GitHub Pages
+
+ .nojekyll                        |    0
+ assets/FONT-LICENSE              | 1028 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ assets/clojure-mark.png          |  Bin 0 -> 1583 bytes
+ assets/clojure-mark.svg          |    1 +
+ assets/headline-italic.woff2     |  Bin 0 -> 26776 bytes
+ assets/headline.woff2            |  Bin 0 -> 25472 bytes
+ assets/luma.js                   |   41 ++++
+ assets/papel-picado-small.svg    |    1 +
+ assets/papel-picado.svg          |    1 +
+ assets/paper.png                 |  Bin 0 -> 11024 bytes
+ assets/qr-preview.svg            |    1 +
+ assets/qr/LICENSE                |  222 ++++++++++++++++++
+ assets/qr/QR8bitByte.js          |   22 ++
+ assets/qr/QRBitBuffer.js         |   38 ++++
+ assets/qr/QRErrorCorrectLevel.js |    7 +
+ assets/qr/QRMaskPattern.js       |   10 +
+ assets/qr/QRMath.js              |   44 ++++
+ assets/qr/QRMode.js              |    6 +
+ assets/qr/QRPolynomial.js        |   66 ++++++
+ assets/qr/QRRSBlock.js           |  298 ++++++++++++++++++++++++
+ assets/qr/QRUtil.js              |  272 ++++++++++++++++++++++
+ assets/qr/index.js               |  462 +++++++++++++++++++++++++++++++++++++
+ assets/rosette.svg               |    1 +
+ assets/site.css                  |  170 ++++++++++++++
+ index.html                       |   27 +++
+ meetup-config.js                 |    2 +
+ meetups/index.html               |   16 ++
+ 27 files changed, 2736 insertions(+)
+
+nothing moved; --apply to fast-forward
+#+end_example
+
+#+name: land-apply
+#+begin_src sh
+atomforge bundle land 5ED17DA1 --apply
+git --no-pager log --oneline main..deploy-site
+#+end_src
+
+#+RESULTS: land-apply
+#+begin_example
+== deploy-site (new)
+bcb042d Add static site for GitHub Pages
+
+ .nojekyll                        |    0
+ assets/FONT-LICENSE              | 1028 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ assets/clojure-mark.png          |  Bin 0 -> 1583 bytes
+ assets/clojure-mark.svg          |    1 +
+ assets/headline-italic.woff2     |  Bin 0 -> 26776 bytes
+ assets/headline.woff2            |  Bin 0 -> 25472 bytes
+ assets/luma.js                   |   41 ++++
+ assets/papel-picado-small.svg    |    1 +
+ assets/papel-picado.svg          |    1 +
+ assets/paper.png                 |  Bin 0 -> 11024 bytes
+ assets/qr-preview.svg            |    1 +
+ assets/qr/LICENSE                |  222 ++++++++++++++++++
+ assets/qr/QR8bitByte.js          |   22 ++
+ assets/qr/QRBitBuffer.js         |   38 ++++
+ assets/qr/QRErrorCorrectLevel.js |    7 +
+ assets/qr/QRMaskPattern.js       |   10 +
+ assets/qr/QRMath.js              |   44 ++++
+ assets/qr/QRMode.js              |    6 +
+ assets/qr/QRPolynomial.js        |   66 ++++++
+ assets/qr/QRRSBlock.js           |  298 ++++++++++++++++++++++++
+ assets/qr/QRUtil.js              |  272 ++++++++++++++++++++++
+ assets/qr/index.js               |  462 +++++++++++++++++++++++++++++++++++++
+ assets/rosette.svg               |    1 +
+ assets/site.css                  |  170 ++++++++++++++
+ index.html                       |   27 +++
+ meetup-config.js                 |    2 +
+ meetups/index.html               |   16 ++
+ 27 files changed, 2736 insertions(+)
+
+moved deploy-site: (new) -> bcb042d
+bcb042d (deploy-site) Add static site for GitHub Pages
+#+end_example
+
+This pushes the branch to =origin=, which publishes it, and opens a PR against =main= with =gh=:
+
+#+name: push-and-pr
+#+begin_src sh
+git push -u origin deploy-site
+gh pr create --base main --head deploy-site \
+  --title "Add static site for GitHub Pages" \
+  --body "Adds the exported static site (index, meetups, assets) at the repo root, plus .nojekyll.
+
+Assets use root-absolute /assets/... links, so this assumes serving from the org root (clojure-cdmx.github.io).
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+#+end_src
+
+#+RESULTS: push-and-pr
+#+begin_example
+Enumerating objects: 37, done.
+Counting objects: 100% (37/37), done.
+Delta compression using up to 14 threads
+Compressing objects: 100% (32/32), done.
+Writing objects: 100% (36/36), 171.15 KiB | 171.15 MiB/s, done.
+Total 36 (delta 2), reused 32 (delta 2), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (2/2), done.        
+remote: 
+remote: Create a pull request for 'deploy-site' on GitHub by visiting:        
+remote:      https://github.com/clojure-cdmx/clojure-cdmx.github.io/pull/new/deploy-site        
+remote: 
+To https://github.com/clojure-cdmx/clojure-cdmx.github.io.git
+ ,* [new branch]      deploy-site -> deploy-site
+branch 'deploy-site' set up to track 'origin/deploy-site'.
+https://github.com/clojure-cdmx/clojure-cdmx.github.io/pull/1
+#+end_example
+
+** Github pages
+
+
+"This branch has not been deployed" is what GitHub shows for a branch that has no Pages deployment. The usual cause is that Pages is set to publish from a different branch (normally =main=), and =deploy-site= is only a PR branch, so nothing is deployed until it is merged. These read-only blocks check that.
+
+First, how Pages is configured: source branch and path, build type, and the URL.
+
+#+name: pages-config
+#+begin_src sh
+gh api repos/clojure-cdmx/clojure-cdmx.github.io/pages
+#+end_src
+
+#+RESULTS: pages-config
+#+begin_example
+{
+  "url": "https://api.github.com/repos/clojure-cdmx/clojure-cdmx.github.io/pages",
+  "status": "built",
+  "cname": null,
+  "custom_404": false,
+  "html_url": "https://clojure-cdmx.github.io/",
+  "build_type": "legacy",
+  "source": {
+    "branch": "main",
+    "path": "/"
+  },
+  "public": true,
+  "protected_domain_state": null,
+  "pending_domain_unverified_at": null,
+  "https_enforced": true
+}
+#+end_example
+
+Then the PR state and whether the site files are on =main= yet.
+
+#+name: pr-and-main
+#+begin_src sh
+gh pr view 1 --json state,mergedAt,baseRefName,headRefName
+git ls-tree --name-only origin/main
+#+end_src
+
+#+RESULTS: pr-and-main
+: {
+:   "baseRefName": "main",
+:   "headRefName": "deploy-site",
+:   "mergedAt": null,
+:   "state": "OPEN"
+: }
+: README.md
+
+Last, any Pages deployments and workflow runs.
+
+#+name: pages-deployments
+#+begin_src sh
+gh api repos/clojure-cdmx/clojure-cdmx.github.io/deployments --jq '.[] | {environment, ref, created_at}'
+gh run list --repo clojure-cdmx/clojure-cdmx.github.io --limit 5
+#+end_src
+
+#+RESULTS: pages-deployments
+: {
+:   "created_at": "2026-11-22T21:38:01Z",
+:   "environment": "github-pages",
+:   "ref": "main"
+: }
+: STATUS  TITLE       WORKFLOW    BRANCH  EVENT    ID          ELAPSED  AGE       
+: ✓       pages b...  pages-b...  main    dynamic  4507314...  43s      about 3...
+
+
+The diagnosis holds: Pages publishes only =main=, and PR #1 is still open, so =deploy-site= was never deployed. Merging the PR puts the site on =main= and starts a Pages build. The next block changes things: it merges PR #1 with a merge commit and keeps the branch.
+
+** Merge the PR
+
+#+name: merge-pr
+#+begin_src sh
+gh pr merge 1 --merge
+#+end_src
+
+#+RESULTS: merge-pr
+: ✓ Merged pull request clojure-cdmx/clojure-cdmx.github.io#1 (Add static site for GitHub Pages)
+
+Read-only: the latest Pages build, which may take a minute to finish. Re-run until its status is =built= and it points at the merge commit.
+
+#+name: pages-build
+#+begin_src sh
+gh api repos/clojure-cdmx/clojure-cdmx.github.io/pages/builds/latest --jq '{status, commit, error: .error.message, updated_at}'
+gh run list --repo clojure-cdmx/clojure-cdmx.github.io --limit 3
+#+end_src
+
+#+RESULTS: pages-build
+: {
+:   "commit": "e99e0ced686c7d50d4e15bc4e5c6218071d613bf",
+:   "error": null,
+:   "status": "built",
+:   "updated_at": "2026-11-26T03:48:49Z"
+: }
+: STATUS  TITLE       WORKFLOW    BRANCH  EVENT    ID          ELAPSED  AGE       
+: ✓       pages b...  pages-b...  main    dynamic  4575124...  25s      less th...
+: ✓       pages b...  pages-b...  main    dynamic  4507314...  43s      about 3...
+
+Read-only: fetch the home page, the meetups page and a few assets, and print the HTTP status for each. Every line should say 200.
+
+#+name: check-site
+#+begin_src sh
+for p in "" meetups/ meetup-config.js assets/site.css assets/luma.js assets/headline.woff2; do
+  curl -s -o /dev/null -w "%{http_code} %{content_type} /$p\n" "https://clojure-cdmx.github.io/$p"
+done
+#+end_src
+
+#+RESULTS: check-site
+: 200 text/html; charset=utf-8 /
+: 200 text/html; charset=utf-8 /meetups/
+: 200 application/javascript; charset=utf-8 /meetup-config.js
+: 200 text/css; charset=utf-8 /assets/site.css
+: 200 application/javascript; charset=utf-8 /assets/luma.js
+: 200 font/woff2 /assets/headline.woff2
+
+** Manual check
+
+[[https://clojure-cdmx.github.io]]
 
