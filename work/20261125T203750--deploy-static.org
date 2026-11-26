@@ -1,8 +1,21 @@
 #+TARGET: clojure_cdmx ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io
 #+TARGET: downloads ~/Downloads
-#+TITLE: deploy-static
+#+PROPERTIES: header-args:sh :exports both
+#+TITLE: Deploy static site
 #+CATEGORY: work
 
+1. Designed a "papel picado" for Clojure, parens, and a "REPL" motif using this prompt:
+
+   
+2. Used ChatGPT to create a site, with this file as an upload.
+
+      #+begin_example
+      I want to create the Clojure Mexico City page. These day-of-the-dead style flags with Clojure themes should be strung at the top, looping down slightly, maybe with a couple of shapes to either side in complementary colors. The contents: "Meetups", taking us to a meetup list. Highlighted on front page:  Next meetup: 1 diciembre, Estación San Miguel, San Miguel Chapultepec. QR code to Luma.
+
+      Theme: professional but playful.
+   #+end_example
+
+3. Continued with a sandboxed Claude, below.
 
 * Deploy as static site to Github Pages                           :downloads:
 
