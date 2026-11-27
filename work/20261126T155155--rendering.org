@@ -10,7 +10,88 @@
 :ID:       BB0DA0EB-1264-40D7-8FF6-06C7590D96A0
 :END:
 
-:AGENT:
-Make flags wave subtly with CSS
-:END:
+** Result
+Branch =make-flags-wave=, on =main=:
+- f4db1f6 Make papel picado flags wave gently in the wind
+
+The garland is an =<img>=, so =assets/site.css= animates the whole image: a 7s ease-in-out loop of small skew/rotate/scale pivoting from the top edge, with a 1.2% horizontal overscale so the =overflow: hidden= box never shows gaps. It is disabled under =prefers-reduced-motion=. Not run: no browser here, so the look is untested; tune the angles in the =flag-wave= keyframes.
+
+Land the handed-off branch: this fetches my bundle into =refs/sandbox/*= and shows the commits. It changes nothing in your checkout.
+
+#+name: land-flags-preview
+#+begin_src sh
+bb sandbox land BB0DA0EB-1264-40D7-8FF6-06C7590D96A0
+#+end_src
+
+Once the commits look right, this moves =make-flags-wave= in your checkout to my tip.
+
+#+name: land-flags-apply
+#+begin_src sh
+bb sandbox land BB0DA0EB-1264-40D7-8FF6-06C7590D96A0 --apply
+#+end_src
+
+The PR text, for you to paste when you push and open the PR yourself (I write no push or PR block, since pushing is yours):
+
+#+begin_example
+Title: Make papel picado flags wave gently in the wind
+
+The papel picado garland on the home and meetups pages now sways gently.
+
+The garland is an <img>, so the CSS animates the whole image: a 7s ease-in-out
+loop of small skew/rotate/scale changes pivoting from the top edge. A 1.2%
+horizontal overscale keeps the overflow:hidden box from showing gaps at the sides.
+The animation is disabled under prefers-reduced-motion.
+
+Only assets/site.css changes. Not checked in a browser. Angles are tunable in the
+flag-wave keyframes.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+#+end_example
+
+Push the landed branch. This publishes =make-flags-wave= to =origin=, so run it only after =land-flags-apply= has run.
+
+#+name: push-flags-wave
+#+begin_src sh
+git push -u origin make-flags-wave
+#+end_src
+
+Open the PR against =main= with gh. This creates the PR on GitHub.
+
+#+name: pr-flags-wave
+#+begin_src sh
+gh pr create --base main --head make-flags-wave \
+  --title "Make papel picado flags wave gently in the wind" \
+  --body "The papel picado garland on the home and meetups pages now sways gently.
+
+The garland is an <img>, so the CSS animates the whole image: a 7s ease-in-out
+loop of small skew/rotate/scale changes pivoting from the top edge. A 1.2%
+horizontal overscale keeps the overflow:hidden box from showing gaps at the sides.
+The animation is disabled under prefers-reduced-motion.
+
+Only assets/site.css changes. Not checked in a browser. Angles are tunable in the
+flag-wave keyframes.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+#+end_src
+
+#+RESULTS: pr-flags-wave
+: https://github.com/clojure-cdmx/clojure-cdmx.github.io/pull/2
+: 
+: 
+: A new release of gh is available: 2.102.0 → 2.106.0
+: To upgrade, run: brew upgrade gh
+: https://github.com/cli/cli/releases/tag/v2.106.0
+
+https://github.com/clojure-cdmx/clojure-cdmx.github.io/pull/2
+
+[[https://github.com/cli/cli/releases/tag/v2.106.0]]
+
+Merge the PR. This merges it on GitHub, so run it only after =pr-flags-wave= has run and you are happy with the PR. =--squash= makes it one commit on =main=, and =--delete-branch= removes =make-flags-wave= from =origin= afterwards.
+
+#+name: merge-flags-wave
+#+begin_src sh
+gh pr merge make-flags-wave --squash --delete-branch
+#+end_src
+
+** Print block to merge the PR
 
