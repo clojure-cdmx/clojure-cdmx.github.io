@@ -53,9 +53,9 @@ main { flex: 1; }
 .garland { display: block; overflow: hidden; padding-top: 13px; }
 .garland img { display: block; width: 100%; height: auto; max-height: 224px; object-fit: fill; }
 @keyframes flag-wave {
-  0%, 100% { transform: scaleX(1.012) skewX(-.7deg) rotate(-.15deg); }
-  35% { transform: scaleX(1.012) skewX(.5deg) rotate(.1deg) scaleY(.995); }
-  70% { transform: scaleX(1.012) skewX(-.2deg) rotate(-.05deg) scaleY(1.004); }
+  0%, 100% { transform: scaleX(1.025) skewX(-2.1deg) rotate(-.45deg); }
+  35% { transform: scaleX(1.025) skewX(1.5deg) rotate(.3deg) scaleY(.985); }
+  70% { transform: scaleX(1.025) skewX(-.6deg) rotate(-.15deg) scaleY(1.012); }
 }
 .garland img { transform-origin: 50% 0; animation: flag-wave 7s ease-in-out infinite; will-change: transform; }
 .home-wrap { width: min(984px,calc(100% - 96px)); margin: 0 auto; }
