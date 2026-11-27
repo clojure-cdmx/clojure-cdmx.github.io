@@ -1,0 +1,16 @@
+#+TARGET: code ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io
+#+TITLE: rendering
+#+CATEGORY: work
+
+* Make flags wave                                                      :code:
+:PROPERTIES:
+:BRANCH:   make-flags-wave
+:BASE:     main
+:REPO:     ~/src/github.com/clojure-cdmx/clojure-cdmx.github.io
+:ID:       BB0DA0EB-1264-40D7-8FF6-06C7590D96A0
+:END:
+
+:AGENT:
+Make flags wave subtly with CSS
+:END:
+
